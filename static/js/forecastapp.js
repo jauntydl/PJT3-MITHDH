@@ -1,243 +1,233 @@
-function highlight_selected_axis_title(x_key, y_key) {
-    initialize_axis_title();
+var y_filters = [["Furniture", "Office Supplies", "Technology"],
+["Bookcases", "Furnishings", "Tables", "Chairs"],
+["Appliances", "Binders", "Envelopes", "Fasteners", "Labels", "Paper", "Storage", "Supplies", "Art"],
+["Accessories", "Machines", "Phones", "Copiers"],
+["Africa", "Asia Pacific", "Europe", "LATAM", "USCA"],
+["Central Africa", "Eastern Africa", "North Africa", "Southern Africa", "Western Africa"],
+["Central Asia", "Eastern Asia", "Oceania", "Southeastern Asia", "Southern Asia", "Western Asia"],
+["Eastern Europe", "Northern Europe", "Southern Europe", "Western Europe"],
+["Caribbean", "Central America", "South America"],
+["Canada", "Central US", "Eastern US", "Southern US", "Western US"]];
 
-    d3.select(`#${x_key}`)
-        .attr("font-weight", 800)
-        .attr("fill", "black");
 
-    d3.select(`#${y_key}`)
-        .attr("font-weight", 800)
-        .attr("fill", "black");
+var input = 0;
+var new_filter = y_filters[input];
+
+width = 400;
+height = 300;
+
+var svg = d3.select("#y_filters")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+
+var g = svg.append("g").attr("transform", "translate(32," + (height / 4) + ")");
+
+var filter = g.selectAll(".y_filter").data(new_filter)
+
+filter.enter()
+    .append("text")
+    .attr("class", "y_filter")
+    .attr("id", "y_filter")
+    .merge(filter)
+    .text(d => d)
+    .attr("y", function (d, i) { return 30 * i });
+
+function update_filter() {
+
+    var t = d3.transition()
+    .duration(750);
+
+
+    var input = parseInt(document.getElementById("keyinput").value);
+    var new_filter = y_filters[input];
+
+    var filter = g.selectAll(".y_filter").data(new_filter)
+
+    filter.exit().remove();
+
+    filter.enter()
+        .append("text")
+        .attr("class", "y_filter")
+        .attr("id", "y_filter")
+        .merge(filter)
+        .transition(t)
+        .text(d => d)
+        .attr("y", function (d, i) { return 20 * i });
+
 }
 
-function initialize_axis_title() {
 
-    var x_keys = ["poverty", "age", "income"];
-    var y_keys = ["obseity", "smokes", "healthcareLow"];
+d3.select("#Main").append("input")
+    .attr("value", 0)
+    .attr("id", "keyinput");
 
-    var combined_keys = x_keys.concat(y_keys);
-
-    combined_keys.forEach(d => {
-        d3.select(`#${d}`)
-            .attr("font-weight", 100)
-            .attr("fill", "gray");
-
-    })
-
-}
+d3.select("#Main")
+    .append("button")
+    .text("change data")
+    .on("click", update_filter)
 
 
-function createScatter(data, x_key, y_key) {
 
-    d3.select("#scatter").html("")
+function PlotChart(data) {
+    var chartbody = d3.select("cbody")
+    chartbody.html("");
 
+    var dataArray = [];
+    var dataCategories = [];
 
-    // set the dimensions and margins of the graph
-    var margin = { top: 10, right: 30, bottom: 100, left: 120 },
-        width = 1000 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
+    data.forEach(d => {
+        dataArray.push(d.Score);
+        dataCategories.push(d.Name);
+    });
 
+    // svg container
+    var height = 600;
+    var width = 1100;
 
-    // append the svg object to the body of the page
-    var svg = d3.select("#scatter")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
+    // margins
+    var margin = {
+        top: 50,
+        right: 50,
+        bottom: 50,
+        left: 50
+    };
 
+    // chart area minus margins
+    var chartHeight = height - margin.top - margin.bottom;
+    var chartWidth = width - margin.left - margin.right;
 
-    var X_domain_start = (data.map(d => d[`${x_key}`]).sort((a, b) => a - b)[0]) * 0.9
-    var X_domain_end = (data.map(d => d[`${x_key}`]).sort((a, b) => a - b)[data.length - 1]) * 1.1
-    var Y_domain_start = (data.map(d => d[`${y_key}`]).sort((a, b) => a - b)[0]) * 0.9
-    var Y_domain_end = (data.map(d => d[`${y_key}`]).sort((a, b) => a - b)[data.length - 1]) * 1.1
+    // create svg container
+    var svg = d3.select("cbody").append("svg")
+        .attr("height", height)
+        .attr("width", width);
 
+    var chartGroup = svg.append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    // Add X axis
-    var x = d3.scaleLinear()
-        .domain([X_domain_start, X_domain_end])
-        .range([Y_domain_start, width]);
+    var yScale = d3.scaleLinear()
+        .domain([0, d3.max(dataArray)])
+        .range([chartHeight, 0]);
 
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .attr("id", "X_Axis")
-        .call(d3.axisBottom(x));
+    // scale x to chart width
+    var xScale = d3.scaleBand()
+        .domain(dataCategories)
+        .range([0, chartWidth])
+        .padding(0.1);
 
-    svg.append("text")
-        .attr("transform",
-            "translate(" + (width / 2) + " ," +
-            (height + margin.top + 30) + ")")
-        .style("text-anchor", "middle")
-        .attr("fill", "gray")
-        .attr("id", "poverty")
-        .attr("class", "axis_select_x")
-        .attr("font-weight", 100)
-        .text("In Poverty(%)");
+    // create axes
+    var yAxis = d3.axisLeft(yScale);
+    var xAxis = d3.axisBottom(xScale);
 
-    svg.append("text")
-        .attr("transform",
-            "translate(" + (width / 2) + " ," +
-            (height + margin.top + 60) + ")")
-        .style("text-anchor", "middle")
-        .attr("fill", "gray")
-        .attr("id", "age")
-        .attr("class", "axis_select_x")
-        .attr("font-weight", 100)
-        .text("Age(Median)");
+    // set x to the bottom of the chart
+    chartGroup.append("g")
+        .attr("transform", `translate(0, ${chartHeight})`)
+        .call(xAxis);
 
-    svg.append("text")
-        .attr("transform",
-            "translate(" + (width / 2) + " ," +
-            (height + margin.top + 90) + ")")
-        .style("text-anchor", "middle")
-        .attr("fill", "gray")
-        .attr("id", "income")
-        .attr("class", "axis_select_x")
-        .attr("font-weight", 100)
-        .text("House Income(Median)");
+    d3.selectAll(".tick")
+        .selectAll('text')
+        .attr("transform", "translate(0,20) rotate(30)")
 
+    // set y to the y axis
+    chartGroup.append("g")
+        .call(yAxis);
 
-    // Add Y axis
-    var y = d3.scaleLinear()
-        .domain([0, Y_domain_end])
-        .range([height, 0]);
-    svg.append("g")
-        .call(d3.axisLeft(y));
-
-    svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left)
-        .attr("x", 0 - (height / 2))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .attr("fill", "gray")
-        .attr("id", "obesity")
-        .attr("class", "axis_select_y")
-        .attr("font-weight", 100)
-        .text("Obese (%)");
-
-    svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left + 30)
-        .attr("x", 0 - (height / 2))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .attr("fill", "gray")
-        .attr("id", "smokes")
-        .attr("class", "axis_select_y")
-        .attr("font-weight", 100)
-        .text("Smokes (%)");
-
-    svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left + 60)
-        .attr("x", 0 - (height / 2))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .attr("fill", "gray")
-        .attr("id", "healthcareLow")
-        .attr("class", "axis_select_y")
-        .attr("font-weight", 100)
-        .text("Lacks Healthcare (%)");
-
-
-    // Add Bubbles
-
-    var node = svg.selectAll(".node")
-        .data(data)
+    // Create the rectangles using data binding
+    var barsGroup = chartGroup.selectAll("rect")
+        .data(dataArray)
         .enter()
-        .append("g")
-        .attr("class", "node")
-        .attr("transform", function (d) {
-            return "translate(" + x(d[`${x_key}`]) + "," + y(d[`${y_key}`]) + ")";
-        });
-
-    node.append("circle")
-        .transition()
-        .duration(700)
-        .attr("r", 25)
-        .style("fill", "lightseagreen")
-        .attr('fill-opacity', 0.3)
-
-    node.append('text')
-        .transition()
-        .duration(700)
-        .text(function (d) { return d.abbr })
-        .style("text-anchor", "middle")
-        .attr("font-family", "sans-serif")
-        .attr("font-size", "20px")
-        .attr("fill", "white")
-        .attr("dy", ".4em")
+        .append("rect")
+        .attr("x", (d, i) => xScale(dataCategories[i]))
+        .attr("y", d => yScale(d))
+        .attr("width", xScale.bandwidth())
+        .attr("height", d => chartHeight - yScale(d))
+        .attr("fill", "lightseagreen");
 
 }
 
-var path = "assets/data/data.csv"
-var x_key = "poverty";
-var y_key = "healthcareLow";
-
-CreateAll();
 
 
-function CreateAll() {
-    d3.csv(path).then(d => {
 
-        createScatter(d, x_key, y_key);
-        highlight_selected_axis_title(x_key, y_key);
+// $(".y_filter")
+//     .on("mouseover", function () {
+//         temp = d3.select(this).attr("fill");
+//         temp2 = d3.select(this).attr("font-weight");
 
-        $(".axis_select_x")
-            .on("click", function (nothing) {
-                x_key = d3.select(this).attr("id");
-                CreateAll();
-            });
+//         d3.select(this)
+//             .transition()
+//             .duration(100)
+//             .attr("fill", "lightseagreen")
+//             .attr("font-weight", 800);
+//     })
+//     .on("mouseout", function () {
+//         d3.select(this)
+//             .transition()
+//             .duration(100)
+//             .attr("fill", temp)
+//             .attr("font-weight", temp2);
+//     });
 
-        $(".axis_select_y")
-            .on("click", function (nothing) {
-                y_key = d3.select(this).attr("id");
-                CreateAll();
-            });
 
-        var temp;
-        var temp2;
 
-        $(".axis_select_x")
-            .on("mouseover", function () {
-                temp = d3.select(this).attr("fill");
-                temp2 = d3.select(this).attr("font-weight");
+// function CreateAll() {
+//     d3.csv(path).then(d => {
 
-                d3.select(this)
-                    .transition()
-                    .duration(100)
-                    .attr("fill", "lightseagreen")
-                    .attr("font-weight", 800);
-            })
-            .on("mouseout", function () {
-                d3.select(this)
-                    .transition()
-                    .duration(100)
-                    .attr("fill", temp)
-                    .attr("font-weight", temp2);
-            });
+//         createScatter(d, x_key, y_key);
+//         highlight_selected_axis_title(x_key, y_key);
 
-        $(".axis_select_y")
-            .on("mouseover", function () {
-                temp = d3.select(this).attr("fill");
-                temp2 = d3.select(this).attr("font-weight");
+//         $(".axis_select_x")
+//             .on("click", function (nothing) {
+//                 x_key = d3.select(this).attr("id");
+//                 CreateAll();
+//             });
 
-                d3.select(this)
-                    .transition()
-                    .duration(100)
-                    .attr("fill", "lightseagreen")
-                    .attr("font-weight", 800);
-            })
-            .on("mouseout", function () {
-                d3.select(this)
-                    .transition()
-                    .duration(100)
-                    .attr("fill", temp)
-                    .attr("font-weight", temp2);
-            });
+//         $(".axis_select_y")
+//             .on("click", function (nothing) {
+//                 y_key = d3.select(this).attr("id");
+//                 CreateAll();
+//             });
 
-    })
-}
+//         var temp;
+//         var temp2;
+
+//         $(".axis_select_x")
+//             .on("mouseover", function () {
+//                 temp = d3.select(this).attr("fill");
+//                 temp2 = d3.select(this).attr("font-weight");
+
+//                 d3.select(this)
+//                     .transition()
+//                     .duration(100)
+//                     .attr("fill", "lightseagreen")
+//                     .attr("font-weight", 800);
+//             })
+//             .on("mouseout", function () {
+//                 d3.select(this)
+//                     .transition()
+//                     .duration(100)
+//                     .attr("fill", temp)
+//                     .attr("font-weight", temp2);
+//             });
+
+//         $(".axis_select_y")
+//             .on("mouseover", function () {
+//                 temp = d3.select(this).attr("fill");
+//                 temp2 = d3.select(this).attr("font-weight");
+
+//                 d3.select(this)
+//                     .transition()
+//                     .duration(100)
+//                     .attr("fill", "lightseagreen")
+//                     .attr("font-weight", 800);
+//             })
+//             .on("mouseout", function () {
+//                 d3.select(this)
+//                     .transition()
+//                     .duration(100)
+//                     .attr("fill", temp)
+//                     .attr("font-weight", temp2);
+//             });
+
+//     })
+// }
 
