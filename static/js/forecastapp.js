@@ -9,7 +9,6 @@ var y_filters = [["Furniture", "Office Supplies", "Technology"],
 ["Caribbean", "Central America", "South America"],
 ["Canada", "Central US", "Eastern US", "Southern US", "Western US"]];
 
-
 var input = 0;
 var new_filter = y_filters[input];
 
