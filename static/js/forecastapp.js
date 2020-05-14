@@ -1,13 +1,104 @@
+path = "forecastresults.csv"
+
+d3.csv(path).then(d => {
+
+    var x_date = ["2016 1Q", , , "2Q", , , "3Q", , , "4Q", , , "2017 1Q", , , "2Q", , , "3Q", , , "4Q", , , "2018 1Q", , , "2Q", , , "3Q", , , "4Q", , , "2019 1Q", , , "2Q", , , "3Q", , , "4Q", , ,
+        "2020 1Q", , , "2Q", , , "3Q", , , "4Q", , , "2021 1Q", , , "2Q", , , "3Q", , , "4Q", , , ];
+        
+    var test = d
+    console.log(test)
+    // console.log(d[0]["y"].length)
+
+
+    // var data1 = d[0]["y"];
+
+    // var data2 = d[1]["y"];
+
+
+    // // set the dimensions and margins of the graph
+    // var margin = { top: 10, right: 30, bottom: 30, left: 50 },
+    //     width = 460 - margin.left - margin.right,
+    //     height = 400 - margin.top - margin.bottom;
+
+    // // append the svg object to the body of the page
+    // var svg = d3.select("#chart")
+    //     .append("svg")
+    //     .attr("width", width + margin.left + margin.right)
+    //     .attr("height", height + margin.top + margin.bottom)
+    //     .append("g")
+    //     .attr("transform",
+    //         "translate(" + margin.left + "," + margin.top + ")");
+
+    // // Initialise a X axis:
+    // var x = d3.scaleLinear().range([0, width]);
+    // var xAxis = d3.axisBottom().scale(x);
+    // svg.append("g")
+    //     .attr("transform", "translate(0," + height + ")")
+    //     .attr("class", "myXaxis")
+
+    // // Initialize an Y axis
+    // var y = d3.scaleLinear().range([height, 0]);
+    // var yAxis = d3.axisLeft().scale(y);
+    // svg.append("g")
+    //     .attr("class", "myYaxis")
+
+    // // Create a function that takes a dataset as input and update the plot:
+    // function update(data) {
+
+    //     // Create the X axis:
+    //     x.domain([0, d3.max(data, function (d) { return d.ser1 })]);
+    //     svg.selectAll(".myXaxis").transition()
+    //         .duration(3000)
+    //         .call(xAxis);
+
+    //     // create the Y axis
+    //     y.domain([0, d3.max(data, function (d) { return d.ser2 })]);
+    //     svg.selectAll(".myYaxis")
+    //         .transition()
+    //         .duration(3000)
+    //         .call(yAxis);
+
+    //     // Create a update selection: bind to the new data
+    //     var u = svg.selectAll(".lineTest")
+    //         .data([data], function (d) { return d.ser1 });
+
+    //     // Updata the line
+    //     u
+    //         .enter()
+    //         .append("path")
+    //         .attr("class", "lineTest")
+    //         .merge(u)
+    //         .transition()
+    //         .duration(3000)
+    //         .attr("d", d3.line()
+    //             .x(function (d) { return x(d.ser1); })
+    //             .y(function (d) { return y(d.ser2); }))
+    //         .attr("fill", "none")
+    //         .attr("stroke", "steelblue")
+    //         .attr("stroke-width", 2.5)
+    // }
+
+    // // At the beginning, I run the update function on the first dataset:
+    // update(data1)
+
+
+
+})
+
+
+
+
+
+
+
+
 var y_filters = [["Furniture", "Office Supplies", "Technology"],
 ["Bookcases", "Furnishings", "Tables", "Chairs"],
 ["Appliances", "Binders", "Envelopes", "Fasteners", "Labels", "Paper", "Storage", "Supplies", "Art"],
 ["Accessories", "Machines", "Phones", "Copiers"],
-["Africa", "Asia Pacific", "Europe", "LATAM", "USCA"],
-["Central Africa", "Eastern Africa", "North Africa", "Southern Africa", "Western Africa"],
-["Central Asia", "Eastern Asia", "Oceania", "Southeastern Asia", "Southern Asia", "Western Asia"],
-["Eastern Europe", "Northern Europe", "Southern Europe", "Western Europe"],
-["Caribbean", "Central America", "South America"],
-["Canada", "Central US", "Eastern US", "Southern US", "Western US"]];
+["Africa", "Asia Pacific", "Europe", "LATAM", "USCA"]]
+
+
 
 var input = 0;
 var new_filter = y_filters[input];
@@ -35,7 +126,7 @@ filter.enter()
 function update_filter() {
 
     var t = d3.transition()
-    .duration(750);
+        .duration(750);
 
 
     var input = parseInt(document.getElementById("keyinput").value);
@@ -143,90 +234,3 @@ function PlotChart(data) {
         .attr("fill", "lightseagreen");
 
 }
-
-
-
-
-// $(".y_filter")
-//     .on("mouseover", function () {
-//         temp = d3.select(this).attr("fill");
-//         temp2 = d3.select(this).attr("font-weight");
-
-//         d3.select(this)
-//             .transition()
-//             .duration(100)
-//             .attr("fill", "lightseagreen")
-//             .attr("font-weight", 800);
-//     })
-//     .on("mouseout", function () {
-//         d3.select(this)
-//             .transition()
-//             .duration(100)
-//             .attr("fill", temp)
-//             .attr("font-weight", temp2);
-//     });
-
-
-
-// function CreateAll() {
-//     d3.csv(path).then(d => {
-
-//         createScatter(d, x_key, y_key);
-//         highlight_selected_axis_title(x_key, y_key);
-
-//         $(".axis_select_x")
-//             .on("click", function (nothing) {
-//                 x_key = d3.select(this).attr("id");
-//                 CreateAll();
-//             });
-
-//         $(".axis_select_y")
-//             .on("click", function (nothing) {
-//                 y_key = d3.select(this).attr("id");
-//                 CreateAll();
-//             });
-
-//         var temp;
-//         var temp2;
-
-//         $(".axis_select_x")
-//             .on("mouseover", function () {
-//                 temp = d3.select(this).attr("fill");
-//                 temp2 = d3.select(this).attr("font-weight");
-
-//                 d3.select(this)
-//                     .transition()
-//                     .duration(100)
-//                     .attr("fill", "lightseagreen")
-//                     .attr("font-weight", 800);
-//             })
-//             .on("mouseout", function () {
-//                 d3.select(this)
-//                     .transition()
-//                     .duration(100)
-//                     .attr("fill", temp)
-//                     .attr("font-weight", temp2);
-//             });
-
-//         $(".axis_select_y")
-//             .on("mouseover", function () {
-//                 temp = d3.select(this).attr("fill");
-//                 temp2 = d3.select(this).attr("font-weight");
-
-//                 d3.select(this)
-//                     .transition()
-//                     .duration(100)
-//                     .attr("fill", "lightseagreen")
-//                     .attr("font-weight", 800);
-//             })
-//             .on("mouseout", function () {
-//                 d3.select(this)
-//                     .transition()
-//                     .duration(100)
-//                     .attr("fill", temp)
-//                     .attr("font-weight", temp2);
-//             });
-
-//     })
-// }
-

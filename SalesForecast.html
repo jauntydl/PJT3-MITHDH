@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>SalesForecast</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" src="{{url_for('static', filename='css/styles.css')}}">
+  <link rel="stylesheet" src="static/css/styles.css">
   </link>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js"></script>
@@ -74,14 +74,6 @@
   <!-- Bootstrap CDN -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </body>
-<script type="text/javascript">
-  var x_m = {{data.x_model}}
-  var y_m = {{data.y_model}}
-  var y_p_m = {{data.y_pred_model}}
-  var x_f = {{data.x_fcst}}
-  var y_f = {{data.y_fcst}}
-  var y_p_f = {{data.y_pred_fcst}}
-</script>
-<script src="{{url_for('static', filename='js/forecastapp.js')}}"></script>
+<script src="static/js/forecastapp.js"></script>
 
 </html>
